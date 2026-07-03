@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+
+  college-event-website:
+    build: .
+    container_name: college-event-website
+    ports:
+      - "8086:8086"
+    restart: always
+    networks:
+      - devops-network
+
+  graphite:
+    image: graphiteapp/graphite-statsd
+    container_name: graphite
+    ports:
+      - "80:80"
+      - "2003:2003"
+      - "8125:8125/udp"
+    restart: always
+    networks:
+      - devops-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      - graphite
+    networks:
+      - devops-network
+
+  nagios:
+    image: jasonrivers/nagios
+    container_name: nagios
+    ports:
+      - "8088:80"
+    restart: always
+    networks:
+      - devops-network
+
+networks:
+  devops-network:
+    driver: bridge
